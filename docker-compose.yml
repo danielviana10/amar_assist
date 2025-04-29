@@ -1,0 +1,55 @@
+services:
+  # Container para o backend Laravel
+  backend:
+    build:
+      context: ./backend
+    image: amarassist-backend
+    container_name: amarassist-backend
+    ports:
+      - "8000:9000" # Expondo a porta 8000 para acessar o Laravel
+    volumes:
+      - ./backend:/var/www
+    networks:
+      - amarassist-network
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=amarassist
+      - DB_USERNAME=root
+      - DB_PASSWORD=rootpassword
+
+  # Container para o MySQL
+  db:
+    image: mysql:8.0
+    container_name: amarassist-db
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: amarassist
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - amarassist-network
+
+  # Container para o front-end Vue.js
+  frontend:
+    image: node:20
+    container_name: amarassist-frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "8080:8080"
+    networks:
+      - amarassist-network
+    command: sh -c "npm install && npm run serve"
+
+volumes:
+  db-data:
+
+networks:
+  amarassist-network:
+    driver: bridge
