@@ -27,4 +27,5 @@ RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 # Expondo a porta 9000 para o PHP-FPM
 EXPOSE 9000
 
-CMD ["php-fpm"]
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+
