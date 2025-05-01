@@ -11,14 +11,10 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
-        return Product::with([
-            'images' => function ($query) {
-                $query->where('deleted', false)
-                    ->orderBy('order');
-            }
-        ])->get();
+        return Product::with(['images' => fn($q) => $q->active()->ordered()])
+            ->paginate($request->per_page ?? 15);
     }
 
 
