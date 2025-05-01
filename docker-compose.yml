@@ -10,6 +10,7 @@ services:
       - "8000:8000" # Expondo a porta 8000 para acessar o Laravel
     volumes:
       - ./backend:/var/www
+      - ./backend/storage/app/public:/var/www/storage/app/public
     networks:
       - amarassist-network
     depends_on:
