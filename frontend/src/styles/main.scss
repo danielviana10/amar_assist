@@ -1,0 +1,12 @@
+@use 'vuetify/styles';
+@import './variables';
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.v-application {
+  font-family: 'Roboto', sans-serif;
+}
