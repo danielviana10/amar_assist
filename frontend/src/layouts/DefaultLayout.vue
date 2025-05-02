@@ -45,7 +45,7 @@ export default defineComponent({
         const authStore = useAuthStore()
 
         const items = [
-            { text: 'Dashboard', icon: 'mdi-view-dashboard', to: '/' },
+            { text: 'Dashboard', icon: 'mdi-view-dashboard', to: '/products' },
             { text: 'Perfil', icon: 'mdi-account', to: '/profile' },
             // Adicione mais itens de menu conforme necessário
         ]

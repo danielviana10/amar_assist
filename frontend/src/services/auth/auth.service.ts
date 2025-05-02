@@ -14,24 +14,35 @@ export class AuthService {
                 withCredentials: true
             });
 
-            return response.data
+            localStorage.setItem('authToken', response.data.token);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+
+            return response.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                const message = error.response?.status === 401
-                    ? 'E-mail ou senha incorretos'
-                    : error.response?.data?.message || 'Falha no login'
-
-                throw new Error(message)
+                console.error('Login error:', error);
+                throw new Error(error.response?.data?.error || 'Login failed');
             }
-            throw new Error('Ocorreu um erro inesperado')
+            throw new Error('An unexpected error occurred during login');
         }
     }
 
     static async logout(): Promise<void> {
         try {
-            await axios.post(`${API_BASE_URL}/logout`)
+            // Remove o token ao fazer logout
+            localStorage.removeItem('authToken');
+            delete axios.defaults.headers.common['Authorization'];
+
+            await axios.post(`${API_BASE_URL}/logout`);
         } catch (error) {
-            console.error('Logout error:', error)
+            console.error('Logout error:', error);
+        }
+    }
+
+    static initAuthToken(): void {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
     }
 

@@ -30,7 +30,7 @@ export default defineComponent({
         const user = computed(() => authStore.user)
 
         const handleLogout = async () => {
-            await authStore.logout()
+            authStore.logout()
             router.push('/login')
         }
 
