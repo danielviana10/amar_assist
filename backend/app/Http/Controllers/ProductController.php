@@ -14,7 +14,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         return Product::with(['images' => fn($q) => $q->active()->ordered()])
-            ->paginate($request->per_page ?? 15);
+            ->paginate($request->per_page ?? 10);
     }
 
 
@@ -102,14 +102,15 @@ class ProductController extends Controller
                 function ($attribute, $value, $fail) {
                     $originalName = pathinfo($value->getClientOriginalName(), PATHINFO_FILENAME);
 
-                    if (!preg_match('/^[a-zA-Z0-9]+-(\d+)$/', $originalName, $matches)) {
-                        $fail("O nome do arquivo deve seguir o padrão 'nome-numero' (ex: camiseta-1).");
+                    // Verifica se tem pelo menos um hífen e número no final
+                    if (!preg_match('/^.+?-(\d+)$/', $originalName, $matches)) {
+                        $fail("O nome do arquivo deve terminar com '-número' (ex: camiseta-1 ou camiseta_alemanha-1).");
                         return;
                     }
 
                     $number = (int) $matches[1];
                     if ($number <= 0) {
-                        $fail("O número após o traço deve ser maior que zero. Recebido: " . $number);
+                        $fail("O número após o hífen deve ser maior que zero. Recebido: " . $number);
                     }
                 }
             ]
@@ -130,25 +131,27 @@ class ProductController extends Controller
         foreach ($request->file('images') as $image) {
             try {
                 $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                [$baseName, $order] = explode('-', $originalName);
-                $order = (int) $order;
+
+                // Separa o nome base do número de ordem (após o ÚLTIMO hífen)
+                $lastHyphenPos = strrpos($originalName, '-');
+                $baseName = substr($originalName, 0, $lastHyphenPos);
+                $order = (int) substr($originalName, $lastHyphenPos + 1);
+
                 $extension = $image->getClientOriginalExtension();
 
-
+                // Restante do código permanece igual...
                 $existingImage = $product->images()
                     ->where('order', $order)
                     ->first();
-
 
                 if ($existingImage) {
                     Storage::disk('public')->delete($existingImage->path);
                     $existingImage->delete();
                 }
 
-
                 $path = $image->storeAs(
                     "products/{$product->id}",
-                    "{$baseName}-{$order}.{$extension}",
+                    "{$baseName}-{$order}.{$extension}", // Mantém o nome original
                     'public'
                 );
 
