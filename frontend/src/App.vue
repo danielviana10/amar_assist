@@ -25,7 +25,3 @@ export default defineComponent({
   }
 })
 </script>
-
-<style scoped>
-/* Estilos globais podem ficar aqui ou em um arquivo separado */
-</style>

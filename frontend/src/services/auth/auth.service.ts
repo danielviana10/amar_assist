@@ -14,8 +14,9 @@ export class AuthService {
                 withCredentials: true
             });
 
-            localStorage.setItem('authToken', response.data.token);
+            localStorage.setItem('token', response.data.token);
             axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+
 
             return response.data;
         } catch (error) {
@@ -29,8 +30,7 @@ export class AuthService {
 
     static async logout(): Promise<void> {
         try {
-            // Remove o token ao fazer logout
-            localStorage.removeItem('authToken');
+            localStorage.removeItem('token');
             delete axios.defaults.headers.common['Authorization'];
 
             await axios.post(`${API_BASE_URL}/logout`);
@@ -40,7 +40,7 @@ export class AuthService {
     }
 
     static initAuthToken(): void {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('token');
         if (token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }

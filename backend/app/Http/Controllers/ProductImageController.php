@@ -5,17 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
-    public function index()
+    public function index(Product $product)
     {
-        return Product::with([
-            'images' => function ($query) {
-                $query->active()->orderBy('order');
-            }
-        ])->get();
+        $images = $product->images()->active()->orderBy('order')->get();
+
+        return response()->json([
+            'data' => $images
+        ]);
     }
 
     public function update(Request $request, ProductImage $image)
@@ -32,14 +31,15 @@ class ProductImageController extends Controller
         ]);
     }
 
+
     public function destroy(ProductImage $image)
     {
-        $image->update(['deleted' => true]);
-
-        $this->reorganizeOrder($image->product);
+        $updated = $image->update(['deleted' => true]);
 
         return response()->json([
-            'message' => 'Imagem marcada como deletada'
+            'message' => 'Imagem marcada como deletada',
+            'success' => $updated,
+            'deleted' => $image->fresh()
         ]);
     }
 

@@ -8,6 +8,24 @@ export interface Product {
     active: boolean;
     images?: ProductImage[];
     firstImage?: ProductImage;
+    isLoading?: boolean;
+}
+
+export interface ProductCreate {
+    title: string;
+    description: string;
+    price: number;
+    cost: number;
+}
+
+export interface ApiResponse<T> {
+    message: string;
+    data: T;
+}
+
+export interface ProductImageWithFile extends ProductImage {
+    file?: File;
+    deleted?: boolean;
 }
 
 export interface ProductImage {
@@ -16,8 +34,10 @@ export interface ProductImage {
     path: string;
     url: string;
     order: number;
-    deleted: boolean;
+    deleted?: boolean;
     file?: File;
+    isDeleting?: boolean;
+    isLoading?: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -38,4 +58,9 @@ export interface PaginatedResponse<T> {
     prev_page_url: string | null;
     to: number;
     total: number;
+}
+
+export interface ProductResponse {
+    message: string;
+    data: Product;
 }

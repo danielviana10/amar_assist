@@ -2,7 +2,6 @@
 import { useAuthStore } from '@/stores/auth/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '@/views/auth/LoginView.vue'
-import HomeView from '@/views/HomeView.vue'
 import ProductsView from '@/views/products/ProductView.vue'
 
 const router = createRouter({
@@ -15,16 +14,17 @@ const router = createRouter({
       meta: { requiresAuth: false }
     },
     {
-      path: '/',
-      name: 'home',
-      component: HomeView,
-      meta: { requiresAuth: true }
-    },
-    {
       path: '/products',
       name: 'products',
       component: ProductsView,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/',
+      redirect: (to) => {
+        const authStore = useAuthStore()
+        return authStore.isAuthenticated ? '/products' : '/login'
+      }
     }
   ]
 })
@@ -35,7 +35,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'login' })
   } else if (to.name === 'login' && authStore.isAuthenticated) {
-    next({ name: 'home' })
+    next({ name: 'products' })
   } else {
     next()
   }
