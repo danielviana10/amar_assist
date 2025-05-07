@@ -2,12 +2,16 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { AuthService } from '@/services/auth/auth.service'
 import type { LoginForm } from '@/types/auth/auth'
+import axios from 'axios'
 
 export const useAuthStore = defineStore('auth', () => {
     const token = ref<string | null>(localStorage.getItem('token'))
     const user = ref<any | null>(null)
-
     const isAuthenticated = ref(!!token.value)
+
+    if (token.value) {
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
+    }
 
     const login = async (formData: LoginForm) => {
         try {
@@ -21,6 +25,8 @@ export const useAuthStore = defineStore('auth', () => {
             } else {
                 sessionStorage.setItem('token', response.token)
             }
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${response.token}`;
         } catch (error) {
             throw error
         }
@@ -32,6 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated.value = false
         localStorage.removeItem('token')
         sessionStorage.removeItem('token')
+        delete axios.defaults.headers.common['Authorization']
     }
 
     return {

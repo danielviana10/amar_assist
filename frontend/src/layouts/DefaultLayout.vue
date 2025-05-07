@@ -1,11 +1,9 @@
 <template>
     <v-layout>
-        <v-app-bar color="primary" prominent>
+        <v-app-bar color="#E5560E" prominent>
             <v-app-bar-nav-icon @click="drawer = !drawer" />
 
-            <v-toolbar-title>Meu Aplicativo</v-toolbar-title>
-
-            <v-spacer />
+            <v-img :src="icon_amar" alt="Logo da Empresa" contain height="40" class="mx-4" />
 
             <v-btn @click="handleLogout" icon>
                 <v-icon>mdi-logout</v-icon>
@@ -36,6 +34,7 @@
 import { defineComponent, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth/authStore'
 import { useRouter } from 'vue-router'
+import icon_amar from '@/assets/imgs/icon_amar.png'
 
 export default defineComponent({
     name: 'DefaultLayout',
@@ -45,9 +44,7 @@ export default defineComponent({
         const authStore = useAuthStore()
 
         const items = [
-            { text: 'Dashboard', icon: 'mdi-view-dashboard', to: '/' },
-            { text: 'Perfil', icon: 'mdi-account', to: '/profile' },
-            // Adicione mais itens de menu conforme necessário
+            { text: 'Dashboard', icon: 'mdi-view-dashboard', to: '/products' }
         ]
 
         const handleLogout = async () => {
@@ -58,7 +55,8 @@ export default defineComponent({
         return {
             drawer,
             items,
-            handleLogout
+            handleLogout,
+            icon_amar
         }
     }
 })

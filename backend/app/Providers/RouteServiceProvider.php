@@ -23,13 +23,10 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('api')
                 ->prefix('api')
-                ->group(function () {
-                    require base_path('routes/api.php');
-
-                    require base_path('routes/api/auth.php');
-                });
+                ->group(base_path('routes/api.php'));
         });
     }
+
 
     protected function configureRateLimiting(): void
     {

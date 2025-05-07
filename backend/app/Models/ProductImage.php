@@ -3,12 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductImage extends Model
 {
 
-    protected $fillable = ['product_id', 'path', 'order'];
+    protected $fillable = ['product_id', 'path', 'order', 'deleted'];
     protected $casts = ['deleted' => 'boolean'];
 
     public function product()
@@ -25,4 +24,11 @@ class ProductImage extends Model
     {
         return $query->where('deleted', false);
     }
+
+
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('order');
+    }
+
 }
