@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductImage extends Model
 {
 
-    protected $fillable = ['product_id', 'path', 'order'];
+    protected $fillable = ['product_id', 'path', 'order', 'deleted'];
     protected $casts = ['deleted' => 'boolean'];
 
     public function product()

@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('custom_auth')->group(function () {
     Route::controller(ProductController::class)->prefix('products')->group(function () {
         Route::get('/', 'index');
         Route::post('/', 'store');
