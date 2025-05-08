@@ -1,0 +1,28 @@
+openapi: 3.0.0
+info:
+  title: AmarAssist API
+  version: 1.0.0
+paths:
+  /api/login:
+    post:
+      summary: Login do usuário
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Sucesso no login
+
+  /api/logout:
+    post:
+      summary: Logout do usuário
+      responses:
+        "200":
+          description: Logout efetuado
