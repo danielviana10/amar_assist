@@ -7,7 +7,7 @@ services:
     image: amarassist-backend
     container_name: amarassist-backend
     ports:
-      - "8000:8000" # Expondo a porta 8000 para acessar o Laravel
+      - "8000:8000"
     volumes:
       - ./backend:/var/www
       - ./backend/storage/app/public:/var/www/storage/app/public
