@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   # Container para o backend Laravel
   backend:
@@ -15,12 +16,6 @@ services:
       - amarassist-network
     depends_on:
       - db
-    environment:
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_DATABASE=amarassist
-      - DB_USERNAME=root
-      - DB_PASSWORD=rootpassword
 
   # Container para o MySQL
   db:

@@ -13,7 +13,13 @@ class AuthService
             return null;
         }
 
-        return Auth::user()->createToken('API Token')->plainTextToken;
+        $user = Auth::user();
+
+        if (!$user instanceof \App\Models\User) {
+            throw new \RuntimeException('Tipo de usuário inválido');
+        }
+
+        return $user->createToken('API Token')->plainTextToken;
     }
 
     public function logout(Request $request): void

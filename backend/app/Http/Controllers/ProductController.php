@@ -8,20 +8,21 @@ use App\Http\Requests\Product\ProductStatusUpdateRequest;
 use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Services\ProductService;
+use App\Services\ProductImageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller
 {
 
     protected $productService;
+    protected $productImageService;
 
-    public function __construct(ProductService $productService)
+    public function __construct(ProductService $productService, ProductImageService $productImageService)
     {
         $this->productService = $productService;
+        $this->productImageService = $productImageService;
     }
 
     public function index(ProductIndexRequest $request)
@@ -79,21 +80,15 @@ class ProductController extends Controller
                 'max:2048',
                 function ($attribute, $value, $fail) {
                     $originalName = pathinfo($value->getClientOriginalName(), PATHINFO_FILENAME);
-
                     if (!preg_match('/^.+?-(\d+)$/', $originalName, $matches)) {
-                        $fail("O nome do arquivo deve terminar com '-número' (ex: camiseta-1 ou camiseta_alemanha-1).");
+                        $fail("O nome do arquivo deve terminar com '-número'.");
                         return;
                     }
-
-                    $number = (int) $matches[1];
-                    if ($number <= 0) {
-                        $fail("O número após o hífen deve ser maior que zero. Recebido: " . $number);
+                    if ((int) $matches[1] <= 0) {
+                        $fail("O número após o hífen deve ser maior que zero.");
                     }
                 }
             ]
-        ], [
-            'images.*.mimes' => 'Apenas formatos JPG, JPEG e PNG são permitidos.',
-            'images.*.max' => 'O tamanho máximo da imagem é 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -103,55 +98,7 @@ class ProductController extends Controller
             ], 422);
         }
 
-        $uploadedImages = [];
-
-        foreach ($request->file('images') as $image) {
-            try {
-                $originalName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
-                $lastHyphenPos = strrpos($originalName, '-');
-                $baseName = substr($originalName, 0, $lastHyphenPos);
-                $order = (int) substr($originalName, $lastHyphenPos + 1);
-                $extension = $image->getClientOriginalExtension();
-
-                $existingImage = ProductImage::where('product_id', $product->id)
-                    ->where('order', $order)
-                    ->first();
-
-                if ($existingImage) {
-                    Storage::disk('public')->delete($existingImage->path);
-
-                    $path = $image->storeAs(
-                        "products/{$product->id}",
-                        "{$baseName}-{$order}.{$extension}",
-                        'public'
-                    );
-
-                    $existingImage->update([
-                        'path' => $path,
-                        'deleted' => false
-                    ]);
-
-                    $uploadedImages[] = $existingImage;
-                } else {
-                    $path = $image->storeAs(
-                        "products/{$product->id}",
-                        "{$baseName}-{$order}.{$extension}",
-                        'public'
-                    );
-
-                    $uploadedImages[] = ProductImage::create([
-                        'product_id' => $product->id,
-                        'path' => $path,
-                        'order' => $order,
-                        'deleted' => false
-                    ]);
-                }
-
-            } catch (\Exception $e) {
-                \Log::error("Erro ao processar imagem {$originalName}: " . $e->getMessage());
-                continue;
-            }
-        }
+        $uploadedImages = $this->productImageService->processImages($request->file('images'), $product);
 
         if (empty($uploadedImages)) {
             return response()->json([
