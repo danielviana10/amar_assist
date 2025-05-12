@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { AuthService } from './auth/auth.service';
+import router from '@/router';
+
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -23,10 +25,12 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
         if (error.response?.status === 401) {
-            AuthService.logout();
-            window.location.href = '/login';
+            if (!error.config.url?.includes('/auth/logout')) {
+                await AuthService.logout();
+                router.push('/login'); 
+            }
         }
         return Promise.reject(error);
     }

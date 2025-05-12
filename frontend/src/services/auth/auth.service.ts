@@ -27,14 +27,20 @@ export class AuthService {
 
     static async logout(): Promise<void> {
         try {
-            localStorage.removeItem('token');
-            delete axios.defaults.headers.common['Authorization'];
+            const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+            if (!token) throw new Error('Token não encontrado');
 
-            await axios.post(`${API_BASE_URL}/logout`);
+            await axios.post(`${API_BASE_URL}/auth/logout`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
         } catch (error) {
-            throw handleAxiosError(error, 'Falharam ao realizar logout', 'Erro ao realizar logout');
+            throw handleAxiosError(error, 'Falha ao realizar logout', 'Erro ao realizar logout');
         }
     }
+
+
 
     static initAuthToken(): void {
         const token = localStorage.getItem('token');

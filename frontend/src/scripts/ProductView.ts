@@ -1,7 +1,8 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useProductStore } from '@/stores/products/productStore'
 import { debounce } from 'lodash'
 import type { Product } from '@/types/products/products'
+import { useAuthStore } from '@/stores/auth/authStore'
 
 export function useProductView() {
   const productStore = useProductStore()
@@ -42,6 +43,13 @@ export function useProductView() {
     color: 'success',
   })
 
+  onMounted(() => {
+    if (sessionStorage.getItem('showWelcomeMessage')) {
+      showSnackbar('Usuário logado com sucesso!', 'success')
+      sessionStorage.removeItem('showWelcomeMessage')
+    }
+  })
+
   const headers = ref([
     { title: 'Imagem', key: 'img', sortable: false, align: 'center' as const },
     { title: 'Título', key: 'title', sortable: false },
@@ -69,6 +77,7 @@ export function useProductView() {
   }
 
   const loadProducts = async (params: { page: number; itemsPerPage: number; search?: string }) => {
+     if (!useAuthStore().isAuthenticated) return;
     loading.value = true
     try {
       const page = params.page || 1

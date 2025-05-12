@@ -28,12 +28,15 @@
             </v-container>
         </v-main>
     </v-layout>
+
+    <AppSnackbar v-model:show="snackbar.show" :message="snackbar.message" :color="snackbar.color" />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth/authStore'
 import { useRouter } from 'vue-router'
+import type { SnackbarState } from '@/types/snackbar/Snackbar'
 import icon_amar from '@/assets/imgs/icon_amar.png'
 
 export default defineComponent({
@@ -42,21 +45,51 @@ export default defineComponent({
         const drawer = ref(true)
         const router = useRouter()
         const authStore = useAuthStore()
+        const snackbar = ref<SnackbarState>({
+            show: false,
+            message: '',
+            color: 'success'
+        })
+        const showSnackbar = (
+            message: string,
+            color: SnackbarState['color'] = 'success',
+            timeout: number = 3000
+        ) => {
+            snackbar.value = { show: true, message, color }
+        }
 
         const items = [
             { text: 'Dashboard', icon: 'mdi-view-dashboard', to: '/products' }
         ]
 
         const handleLogout = async () => {
-            await authStore.logout()
-            router.push('/login')
-        }
+            try {
+                console.log("[1] Iniciando logout...");
+                drawer.value = false;
+
+                console.log("[2] Chamando authStore.logout()");
+                await authStore.logout();
+
+                console.log("[3] Logout completo - navegando para /login");
+                localStorage.setItem('logoutSuccessMessage', 'true');
+                await router.push('/login'); // Await é crucial aqui
+
+                console.log("[4] Navegação concluída");
+            } catch (error) {
+                console.error("[ERROR] Falha no logout:", error);
+                showSnackbar('Erro ao fazer logout', 'error');
+            }
+        };
+
+
 
         return {
             drawer,
             items,
             handleLogout,
-            icon_amar
+            icon_amar,
+            snackbar,
+            showSnackbar
         }
     }
 })

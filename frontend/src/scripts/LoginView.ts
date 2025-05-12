@@ -1,11 +1,31 @@
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth/authStore'
 import type { LoginForm } from '@/types/auth/auth'
+import type { SnackbarState } from '@/types/snackbar/Snackbar'
 
 export function useLogin() {
   const router = useRouter()
   const authStore = useAuthStore()
+  const snackbar = ref<SnackbarState>({
+    show: false,
+    message: '',
+    color: 'success'
+  })
+  const showSnackbar = (
+    message: string,
+    color: SnackbarState['color'] = 'success',
+    timeout: number = 3000
+  ) => {
+    snackbar.value = { show: true, message, color }
+  }
+
+  onMounted(() => {
+    if (localStorage.getItem('logoutSuccessMessage')) {
+      showSnackbar('Usuário deslogado com sucesso', 'info');
+      localStorage.removeItem('logoutSuccessMessage');
+    }
+  });
 
   const form = reactive<LoginForm>({
     email: '',
@@ -23,6 +43,7 @@ export function useLogin() {
 
     try {
       await authStore.login(data)
+      sessionStorage.setItem('showWelcomeMessage', 'true')
       router.push('/products')
     } catch (error) {
       errorMessage.value = error instanceof Error
@@ -49,5 +70,7 @@ export function useLogin() {
     errorMessage,
     showToast,
     isSubmitting,
+    snackbar,
+    showSnackbar
   }
 }

@@ -2,7 +2,7 @@ import { ref, computed, watch } from 'vue'
 import { useProductStore } from '@/stores/products/productStore'
 import { useImageStore } from '@/stores/images/imageStore'
 import type { ProductCreate } from '@/types/products/products'
-import type { SnackbarState } from '@/types/snackbar/snackbar'
+import type { SnackbarState } from '@/types/snackbar/Snackbar'
 import {
     titleRules,
     descriptionRules,
@@ -37,6 +37,7 @@ export function useProductDialog(props: any, emit: any) {
     ) => {
         snackbar.value = { show: true, message, color }
     }
+    
     const localProduct = ref<ProductCreate>({
         ...props.product,
         title: props.product.title || '',
@@ -72,6 +73,7 @@ export function useProductDialog(props: any, emit: any) {
         resetForm()
         emit('update:modelValue', false)
     }
+
     const handleSave = async () => {
         if (!form.value) return
 
@@ -90,7 +92,6 @@ export function useProductDialog(props: any, emit: any) {
             }
 
             const response = await productStore.createProduct(productData)
-            console.log('response', response)
             if (newImages.value.length > 0 && response.data?.id) {
                 await imageStore.uploadImages(response.data.id, newImages.value)
             }

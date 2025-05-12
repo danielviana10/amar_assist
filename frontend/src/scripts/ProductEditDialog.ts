@@ -1,7 +1,7 @@
 import { useImageStore } from '@/stores/images/imageStore';
 import { useProductStore } from '@/stores/products/productStore';
 import type { Product, ProductImage } from '@/types/products/products';
-import type { SnackbarState } from '@/types/snackbar/snackbar'
+import type { SnackbarState } from '@/types/snackbar/Snackbar'
 import { ref, computed, watch } from 'vue';
 import {
     titleRules,

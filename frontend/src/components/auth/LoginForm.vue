@@ -41,8 +41,6 @@ import { emailRules, passwordRules } from '@/utils/formRules';
 import { reactive, ref, toRefs, watchEffect } from 'vue'
 import type { LoginForm } from '@/types/auth/auth'
 
-
-
 const props = defineProps<{
   modelValue: LoginForm
   isSubmitting: boolean
