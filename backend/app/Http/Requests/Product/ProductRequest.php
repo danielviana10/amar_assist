@@ -9,7 +9,7 @@ class ProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|string|max:50',
+            'title' => 'required|string|max:50|unique:products',
             'cost' => 'required|numeric|min:0|max:100000',
             'price' => [
                 'required',
@@ -26,6 +26,7 @@ class ProductRequest extends FormRequest
                 }
             ],
             'description' => 'required|string|max:200',
+            'active' => 'boolean',
         ];
     }
 
@@ -33,10 +34,12 @@ class ProductRequest extends FormRequest
     {
         return [
             'title.required' => 'O título é obrigatório.',
+            'title.unique' => 'O título já está em uso.',
             'cost.required' => 'O custo é obrigatório.',
             'price.required' => 'O preço é obrigatório.',
             'price.min' => 'O preço de venda deve ser pelo menos 10% maior que o custo.',
             'description.required' => 'A descrição é obrigatória.',
+            'active.boolean' => 'O campo ativo deve ser verdadeiro ou falso.',
         ];
     }
 }

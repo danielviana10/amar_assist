@@ -172,6 +172,6 @@ return [
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
-        App\Providers\RouteServiceProvider::class, // ← ADICIONE ESTA LINHA
+        App\Providers\RouteServiceProvider::class,
     ],
 ];

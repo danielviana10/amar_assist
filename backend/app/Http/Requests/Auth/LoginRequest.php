@@ -35,6 +35,7 @@ class LoginRequest extends FormRequest
             'email.required' => 'O e-mail é obrigatório.',
             'email.email' => 'O e-mail deve ser válido.',
             'password.required' => 'A senha é obrigatória.',
+            'password.min' => 'A senha deve ter pelo menos 4 caracteres.',
         ];
     }
 

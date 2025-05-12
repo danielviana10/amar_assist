@@ -9,7 +9,6 @@ Route::middleware('custom_auth')->group(function () {
         Route::post('/', 'store');
         Route::get('/{product}', 'show');
         Route::put('/{product}', 'update');
-        Route::post('/{product}/image', 'addImages');
         Route::patch('/{product}/status', 'updateStatus');
     });
 });

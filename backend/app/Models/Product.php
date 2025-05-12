@@ -9,11 +9,15 @@ class Product extends Model
 
     protected $fillable = [
         'title',
-        'img',
         'price',
         'cost',
         'description',
         'active',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at'
     ];
 
     public function images()

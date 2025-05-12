@@ -13,15 +13,15 @@ class CustomAuthenticate
         $token = $request->bearerToken();
 
         if (!$token) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
+            return response()->json(['message' => 'Não autenticado'], 401);
         }
 
         try {
             if (!Auth::guard('sanctum')->check()) {
-                return response()->json(['message' => 'Invalid token'], 401);
+                return response()->json(['message' => 'Token inválido'], 401);
             }
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Invalid token'], 401);
+            return response()->json(['message' => 'Token inválido'], 401);
         }
 
         return $next($request);

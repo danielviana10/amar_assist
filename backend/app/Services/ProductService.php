@@ -18,6 +18,7 @@ class ProductService
             ->orderByDesc('created_at')
             ->paginate($perPage);
     }
+    
     public function createProduct($data)
     {
         return Product::create($data);

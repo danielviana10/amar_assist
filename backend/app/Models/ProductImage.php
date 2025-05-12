@@ -9,6 +9,11 @@ class ProductImage extends Model
 
     protected $fillable = ['product_id', 'path', 'order', 'deleted'];
     protected $casts = ['deleted' => 'boolean'];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
+
 
     public function product()
     {
@@ -30,5 +35,4 @@ class ProductImage extends Model
     {
         return $query->orderBy('order');
     }
-
 }
