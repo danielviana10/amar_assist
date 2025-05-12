@@ -20,6 +20,12 @@
   <li><a href="https://www.notion.so/Amar-Assist-API-1-0-1ee8ed6afd0180a8ac25fe8352938c8f?pvs=4" target="_blank">Amar Assist API</a></li>
 </ul>
 
+<h2>Workspace Amar Assist POSTMAN</h2>
+<p>O workspace da API está disponível no Postman, é necessário adicionar o TOKEN do usuário como variável.</p>
+<ul>
+  <li><a href="https://www.postman.com/research-geologist-66458252/workspace/amar-workspace/collection/37103779-9c7cc1e0-dc86-4092-8ede-5d5c8e67ed61?action=share&creator=37103779&active-environment=37103779-632b9de4-b8f5-4bd7-8469-3558c8e6d2df" target="_blank">Amar Assist POSTMAN</a></li>
+</ul>
+
 <h2>📁 Estrutura do Projeto</h2>
 <pre>
 /amarassist
