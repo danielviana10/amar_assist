@@ -90,11 +90,10 @@ export function useProductDialog(props: any, emit: any) {
             }
 
             const response = await productStore.createProduct(productData)
-
+            console.log('response', response)
             if (newImages.value.length > 0 && response.data?.id) {
                 await imageStore.uploadImages(response.data.id, newImages.value)
             }
-
             emit('product-created', response)
             showSnackbar('Produto salvo com sucesso!', 'success')
             closeDialog()

@@ -21,7 +21,7 @@ export class ImagesService {
                 formData.append('images[]', image);
             });
 
-            const response = await api.post(`/products/${productId}/image`, formData, {
+            const response = await api.post(`/images/${productId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -35,7 +35,7 @@ export class ImagesService {
 
     static async deleteImage(imageId: ProductImage['id']): Promise<ProductImage> {
         try {
-            const response = await api.delete(`${API_BASE_URL}/images/${imageId}`);
+            const response = await api.delete(`/images/${imageId}`);
             return response.data.deleted;
         } catch (error) {
             throw handleAxiosError(error, 'Falha ao remover imagem', 'Imagem não encontrada');

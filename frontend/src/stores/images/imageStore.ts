@@ -33,7 +33,7 @@ export const useImageStore = defineStore('image', () => {
         error.value = null;
         try {
             const uploadedImages = await ImagesService.uploadImages(productId, files);
-
+            console.log('uploadedImages', uploadedImages);
             if (!productImages.value[productId]) {
                 productImages.value[productId] = [];
             }

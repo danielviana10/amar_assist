@@ -35,7 +35,7 @@ class ProductController extends Controller
 
         return response()->json([
             'message' => 'Produto criado com sucesso',
-            'data' => $product->makeHidden(['id', 'created_at', 'updated_at']),
+            'data' => $product->makeHidden(['created_at', 'updated_at']),
         ], 201);
     }
 
