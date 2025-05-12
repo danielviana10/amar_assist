@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Verificando dependências do Composer..."
+composer show knuckles/scribe
+
 # Configura variáveis de ambiente
 export $(grep -v '^#' .env | xargs)
 
