@@ -1,15 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Product, ProductImage } from '@/types/products/Products';
+import type { PaginatedResponse, Pagination, Product, ProductImage, ProductResponse } from '@/types/products/products';
 import { ProductService } from '@/services/products/products.service';
 import { api } from '@/services/api';
-
-interface Pagination {
-  current_page: number;
-  per_page: number;
-  total: number;
-  last_page: number;
-}
 
 export const useProductStore = defineStore('product', () => {
   const products = ref<Array<Omit<Product, 'images'> & { image?: ProductImage | null }>>([]);
@@ -22,7 +15,7 @@ export const useProductStore = defineStore('product', () => {
   const loading = ref(false);
   const error = ref<string | null>(null);
 
-  const fetchProducts = async (page?: number, perPage?: number, search?: string) => {
+  const fetchProducts = async (page?: number, perPage?: number, search?: string): Promise<PaginatedResponse<Product>> => {
     loading.value = true;
     error.value = null;
     try {
@@ -34,14 +27,16 @@ export const useProductStore = defineStore('product', () => {
         total: response.total,
         last_page: response.last_page
       };
+      return response; 
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Erro desconhecido';
+      throw err; 
     } finally {
       loading.value = false;
     }
   };
 
-  const fetchProductsById = async (productId: Product['id']) => {
+  const fetchProductsById = async (productId: Product['id']): Promise<Product> => {
     loading.value = true;
     error.value = null;
     try {
@@ -56,7 +51,7 @@ export const useProductStore = defineStore('product', () => {
     }
   }
 
-  const createProduct = async (productData: Omit<Product, 'id'>): Promise<{ message: string; data: Product }> => {
+  const createProduct = async (productData: Omit<Product, 'id'>): Promise<ProductResponse> => {
     try {
       const response = await api.post('/products', {
         title: productData.title,
@@ -72,7 +67,7 @@ export const useProductStore = defineStore('product', () => {
     }
   };
 
-  const updateProduct = async (productData: Product) => {
+  const updateProduct = async (productData: Product): Promise<Product> => {
     loading.value = true;
     error.value = null;
     try {
@@ -91,7 +86,7 @@ export const useProductStore = defineStore('product', () => {
     }
   };
 
-  const toggleProductStatus = async (productId: Product['id'], status: Product['active']) => {
+  const toggleProductStatus = async (productId: Product['id'], status: Product['active']): Promise<Product> => {
     try {
       const response = await api.patch(`/products/${productId}/status`, { active: status });
       const index = products.value.findIndex(p => p.id === productId);

@@ -1,23 +1,24 @@
 import { ref, computed, watch } from 'vue'
 import { useProductStore } from '@/stores/products/productStore'
 import { useImageStore } from '@/stores/images/imageStore'
-import type { ProductCreate } from '@/types/products/Products'
-import type { SnackbarState } from '@/types/snackbar/Snackbar'
+import type { ProductCreate } from '@/types/products/products'
+import type { SnackbarState } from '@/types/snackbar/snackbar'
 import {
     titleRules,
     descriptionRules,
     costRules,
     priceRules,
     imageRules,
-    sanitizeDescription,
+    validateUniqueOrders,
+    validateImageFormat,
+    getImageOrder,
+    sanitizeDescription
 } from '@/utils/formRules'
 
 export function useProductDialog(props: any, emit: any) {
 
     const productStore = useProductStore()
     const imageStore = useImageStore()
-
-
     const internalDialog = ref(props.modelValue)
     const form = ref()
     const fileInputKey = ref(0)
@@ -29,7 +30,6 @@ export function useProductDialog(props: any, emit: any) {
         message: '',
         color: 'success'
     })
-
     const showSnackbar = (
         message: string,
         color: SnackbarState['color'] = 'success',
@@ -37,7 +37,6 @@ export function useProductDialog(props: any, emit: any) {
     ) => {
         snackbar.value = { show: true, message, color }
     }
-
     const localProduct = ref<ProductCreate>({
         ...props.product,
         title: props.product.title || '',
@@ -45,20 +44,8 @@ export function useProductDialog(props: any, emit: any) {
         price: Number(props.product.price) || 0,
         cost: Number(props.product.cost) || 0
     })
-
-
-    const titleValidate = computed(() => titleRules)
-    const descriptionValidate = computed(() => descriptionRules)
-    const priceValidate = computed(() => priceRules(localProduct.value.cost))
-    const costValidate = computed(() => costRules(localProduct.value.price))
-    const imageValidate = computed(() => imageRules)
     const isFormValid = computed(() => form.value?.isValid || false)
-    const title = computed(() => props.product.id ? 'Editar Produto' : 'Novo Produto')
-
-
-    const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg']
-
-
+    const title = 'Novo Produto'
     const resetForm = () => {
         localProduct.value = {
             title: '',
@@ -72,33 +59,19 @@ export function useProductDialog(props: any, emit: any) {
         form.value?.reset()
     }
 
-
-
-    const sanitizeValidade = () => {
-        localProduct.value.description = sanitizeDescription(localProduct.value.description)
-    }
-
-    const getImageOrder = (fileName: string): number => {
-        const match = fileName.match(/-(\d+)\.\w+$/)
-        return match ? parseInt(match[1]) : 0
-    }
-
-    const isValidImage = (file: File): boolean => {
-        const namePattern = /^[a-zA-Z0-9_-]+-[1-9]\d*\.(jpe?g|png)$/i
-        return namePattern.test(file.name) && allowedImageTypes.includes(file.type)
-    }
-
-    const removePreviewImage = (index: number) => {
-        previewImages.value.splice(index, 1)
-        newImages.value.splice(index, 1)
-        fileInputKey.value++
+    const removePreviewImage = (fileName: string) => {
+        const index = newImages.value.findIndex(file => file.name === fileName)
+        if (index !== -1) {
+            newImages.value.splice(index, 1)
+            previewImages.value = previewImages.value.filter(img => img.file.name !== fileName)
+            fileInputKey.value++
+        }
     }
 
     const closeDialog = () => {
         resetForm()
         emit('update:modelValue', false)
     }
-
     const handleSave = async () => {
         if (!form.value) return
 
@@ -133,7 +106,6 @@ export function useProductDialog(props: any, emit: any) {
         }
     }
 
-
     watch(
         () => props.modelValue,
         (val) => {
@@ -147,7 +119,7 @@ export function useProductDialog(props: any, emit: any) {
                     cost: Number(props.product.cost) || 0
                 }
             }
-        }
+        },
     )
 
     watch(
@@ -156,9 +128,20 @@ export function useProductDialog(props: any, emit: any) {
             previewImages.value = []
             if (!files || files.length === 0) return
 
-            const validFiles = files.filter(isValidImage)
+            const validFiles = files.filter(file => validateImageFormat(file))
             if (validFiles.length !== files.length) {
+                const invalidCount = files.length - validFiles.length
+                const message = invalidCount === 1
+                    ? '1 imagem inválida foi removida.'
+                    : `${invalidCount} imagens inválidas foram removidas.`
+                showSnackbar(message, 'error')
                 newImages.value = validFiles
+                return
+            }
+
+            if (!validateUniqueOrders(validFiles)) {
+                showSnackbar('Não é permitido ter imagens com a mesma ordem numérica', 'error')
+                newImages.value = []
                 return
             }
 
@@ -183,11 +166,11 @@ export function useProductDialog(props: any, emit: any) {
         title,
         newImages,
         loading,
-        priceValidate,
-        titleValidate,
-        descriptionValidate,
-        costValidate,
-        imageValidate,
+        titleRules,
+        descriptionRules,
+        priceRules,
+        costRules,
+        imageRules,
         previewImages,
         fileInputKey,
         isFormValid,
@@ -197,6 +180,6 @@ export function useProductDialog(props: any, emit: any) {
         removePreviewImage,
         closeDialog,
         handleSave,
-        sanitizeValidade
+        sanitizeDescription
     }
 }

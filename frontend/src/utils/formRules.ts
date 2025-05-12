@@ -1,7 +1,7 @@
 export const emailRules = [
     (v: string) => !!v || 'E-mail é obrigatório',
     (v: string) => /.+@.+\..+/.test(v) || 'E-mail deve ser válido',
-    (v: string) => (v && v.length <= 50) || 'Máximo de 60 caracteres'
+    (v: string) => (v && v.length <= 100) || 'Máximo de 100 caracteres'
 ]
 
 export const passwordRules = [
@@ -33,13 +33,27 @@ export const costRules = (price: number) => [
 ];
 
 export const allowedImageTypes = ['image/jpeg', 'image/png', 'image/jpg']
+export const imageNamePattern = /^[a-zA-Z0-9_-]+-(\d+)\.(jpe?g|png)$/i;
+
+export const validateImageFormat = (file: File): boolean => {
+    return imageNamePattern.test(file.name) && allowedImageTypes.includes(file.type);
+};
+
+export const getImageOrder = (fileName: string): number => {
+    const match = fileName.match(imageNamePattern);
+    return match ? parseInt(match[1]) : 0;
+};
+
+export const validateUniqueOrders = (files: File[]): boolean => {
+    const orders = files.map(file => getImageOrder(file.name));
+    const uniqueOrders = new Set(orders);
+    return uniqueOrders.size === orders.length;
+};
 
 export const imageRules = [
-    (files: File[]) => !files || files.every(file =>
-        /^[a-zA-Z0-9_-]+-[1-9]\d*\.(jpe?g|png)$/i.test(file.name) &&
-        allowedImageTypes.includes(file.type)
-    ) || 'Padrão: produto-1.jpg ou produto-2.png (números ≥ 1)'
-]
+    (files: File[]) => !files || files.every(validateImageFormat) || 'Formato inválido (ex: produto-1.jpg)',
+    (files: File[]) => !files || validateUniqueOrders(files) || 'Números de ordem não podem repetir'
+];
 
 export const sanitizeDescription = (description: string): string => {
     if (!description) return ''

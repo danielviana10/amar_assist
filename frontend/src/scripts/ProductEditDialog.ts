@@ -1,15 +1,25 @@
 import { useImageStore } from '@/stores/images/imageStore';
 import { useProductStore } from '@/stores/products/productStore';
-import type { Product, ProductImage } from '@/types/products/Products';
-import type { SnackbarState } from '@/types/snackbar/Snackbar'
+import type { Product, ProductImage } from '@/types/products/products';
+import type { SnackbarState } from '@/types/snackbar/snackbar'
 import { ref, computed, watch } from 'vue';
+import {
+    titleRules,
+    descriptionRules,
+    costRules,
+    priceRules,
+    imageRules,
+    sanitizeDescription,
+    validateUniqueOrders,
+    validateImageFormat,
+    getImageOrder
+} from '@/utils/formRules'
 
 export function useProductEditDialog(props: any, emit: any) {
     const imageStore = useImageStore();
     const productStore = useProductStore();
     const baseImgUrl = 'http://localhost:8000/storage/';
     const formRef = ref<HTMLFormElement | null>(null);
-
     const editingProduct = ref<Product>({ ...props.product });
     const newImages = ref<File[]>([]);
     const productImages = ref<ProductImage[]>([]);
@@ -115,33 +125,6 @@ export function useProductEditDialog(props: any, emit: any) {
         return `${baseImgUrl}${path}`;
     };
 
-    const sanitizeDescription = () => {
-        if (!editingProduct.value.description) return;
-
-        editingProduct.value.description = editingProduct.value.description.replace(
-            /<(?!\/?(p|br|b|strong)(\s[^>]*)?>)[^>]+>/gi, ''
-        );
-        editingProduct.value.description = editingProduct.value.description.replace(
-            /<(p|b|strong)\s+[^>]*>/gi, '<$1>'
-        );
-    };
-
-    const validatePrice = (price: number, cost: number): boolean => {
-        if (!price || !cost) return true;
-        return price >= cost * 1.1;
-    };
-
-    const validateCost = (cost: number, price: number): boolean => {
-        if (!cost || !price) return true;
-        return price >= cost * 1.1;
-    };
-
-    const validateImageType = (files: File[]): boolean => {
-        if (!files.length) return true;
-        return files.every(file =>
-            ['image/jpeg', 'image/png'].includes(file.type)
-        )
-    };
 
     return {
         formRef,
@@ -157,10 +140,15 @@ export function useProductEditDialog(props: any, emit: any) {
         saveProductChanges,
         closeDialog,
         getFullImageUrl,
+        titleRules,
+        descriptionRules,
+        costRules,
+        priceRules,
+        imageRules,
         sanitizeDescription,
-        validatePrice,
-        validateCost,
-        validateImageType
+        validateUniqueOrders,
+        validateImageFormat,
+        getImageOrder
     };
 
 }

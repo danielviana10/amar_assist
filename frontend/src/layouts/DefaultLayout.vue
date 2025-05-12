@@ -12,7 +12,7 @@
 
         <v-navigation-drawer v-model="drawer">
             <v-list>
-                <v-list-item v-for="(item, i) in items" :key="i" :value="item" :to="item.to" active-color="primary">
+                <v-list-item v-for="(item, i) in items" :key="i" :value="item" :to="item.to" color="primary">
                     <template v-slot:prepend>
                         <v-icon :icon="item.icon" />
                     </template>

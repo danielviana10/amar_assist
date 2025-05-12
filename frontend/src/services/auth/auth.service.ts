@@ -1,5 +1,6 @@
 import axios from 'axios'
-import type { LoginForm, LoginResponse } from '@/types/auth/auth'
+import type { LoginForm, LoginResponse, User } from '@/types/auth/auth'
+import { handleAxiosError } from '@/utils/handleAxiosErros';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -20,11 +21,7 @@ export class AuthService {
 
             return response.data;
         } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.error('Login error:', error);
-                throw new Error(error.response?.data?.error || 'Login failed');
-            }
-            throw new Error('An unexpected error occurred during login');
+            throw handleAxiosError(error, 'Usuário ou senha inválidos', 'Falha ao realizar login');
         }
     }
 
@@ -35,7 +32,7 @@ export class AuthService {
 
             await axios.post(`${API_BASE_URL}/logout`);
         } catch (error) {
-            console.error('Logout error:', error);
+            throw handleAxiosError(error, 'Falharam ao realizar logout', 'Erro ao realizar logout');
         }
     }
 
@@ -43,18 +40,6 @@ export class AuthService {
         const token = localStorage.getItem('token');
         if (token) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        }
-    }
-
-    static async getCurrentUser(): Promise<any> {
-        try {
-            const response = await axios.get(`${API_BASE_URL}/user`)
-            return response.data
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                throw new Error(error.response?.data?.message || 'Failed to fetch user')
-            }
-            throw new Error('An unexpected error occurred')
         }
     }
 }

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import type { Product, ProductImage } from '@/types/products/Products';
+import type { Product, ProductImage } from '@/types/products/products';
 import { ImagesService } from '@/services/images/images.service';
 
 export const useImageStore = defineStore('image', () => {
@@ -54,31 +54,6 @@ export const useImageStore = defineStore('image', () => {
     };
 
 
-    const updateImageOrder = async (imageId: string, order: number): Promise<ProductImage> => {
-        loading.value = true;
-        error.value = null;
-        try {
-            const updatedImage = await ImagesService.updateImageOrder(imageId, order);
-
-            for (const productId in productImages.value) {
-                const index = productImages.value[productId].findIndex(img => img.id === imageId);
-                if (index !== -1) {
-                    productImages.value[productId][index] = updatedImage;
-
-                    productImages.value[productId].sort((a, b) => a.order - b.order);
-                    break;
-                }
-            }
-
-            return updatedImage;
-        } catch (err) {
-            error.value = err instanceof Error ? err.message : 'Erro desconhecido';
-            throw err;
-        } finally {
-            loading.value = false;
-        }
-    };
-
     const deleteImage = async (imageId: ProductImage['id']): Promise<ProductImage> => {
         loading.value = true;
         error.value = null;
@@ -99,7 +74,7 @@ export const useImageStore = defineStore('image', () => {
         }
     };
 
-    const getImagesByProductId = (productId: string): ProductImage[] => {
+    const getImagesByProductId = (productId: ProductImage['product_id']): ProductImage[] => {
         return productImages.value[productId] || [];
     };
 
@@ -109,7 +84,6 @@ export const useImageStore = defineStore('image', () => {
         productImages,
         fetchProductImages,
         uploadImages,
-        updateImageOrder,
         deleteImage,
         getImagesByProductId
     };

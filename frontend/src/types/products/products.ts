@@ -40,6 +40,13 @@ export interface ProductImage {
     isLoading?: boolean;
 }
 
+export interface Pagination {
+  current_page: number;
+  per_page: number;
+  total: number;
+  last_page: number;
+}
+
 export interface PaginatedResponse<T> {
     current_page: number;
     data: T[];

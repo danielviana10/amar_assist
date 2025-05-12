@@ -1,16 +1,9 @@
-import axios from 'axios';
-import type { PaginatedResponse, Product, ProductResponse } from '@/types/products/Products';
+import type { PaginatedResponse, Product, ProductResponse } from '@/types/products/products';
 import { api } from '../api';
+import { handleAxiosError } from '@/utils/handleAxiosErros';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-function handleAxiosError(error: unknown, defaultMessage: string, notFoundMessage?: string) {
-    if (axios.isAxiosError(error)) {
-        if (error.response?.status === 404 && notFoundMessage) return new Error(notFoundMessage);
-        return new Error(error.response?.data?.message || defaultMessage);
-    }
-    return new Error('Ocorreu um erro inesperado');
-}
 export class ProductService {
 
     static async getProducts(page?: number, perPage?: number, search?: string): Promise<PaginatedResponse<Product>> {

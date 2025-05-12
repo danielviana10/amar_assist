@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, watch, computed } from 'vue'
-import type { SnackbarState } from '@/types/snackbar/Snackbar'
+import type { SnackbarState } from '@/types/snackbar/snackbar'
 
 export default defineComponent({
   name: 'AppSnackbar',

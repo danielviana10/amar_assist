@@ -1,16 +1,9 @@
 import axios from 'axios';
-import type { Product, ProductImage } from '@/types/products/Products';
+import type { Product, ProductImage } from '@/types/products/products';
 import { api } from '../api';
+import { handleAxiosError } from '@/utils/handleAxiosErros';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-function handleAxiosError(error: unknown, defaultMessage: string, notFoundMessage?: string) {
-    if (axios.isAxiosError(error)) {
-        if (error.response?.status === 404 && notFoundMessage) return new Error(notFoundMessage);
-        return new Error(error.response?.data?.message || defaultMessage);
-    }
-    return new Error('Ocorreu um erro inesperado');
-}
 
 export class ImagesService {
     static async getProductImages(productId: Product['id']): Promise<ProductImage[]> {
@@ -41,16 +34,7 @@ export class ImagesService {
         }
     }
 
-    static async updateImageOrder(imageId: string, order: number): Promise<ProductImage> {
-        try {
-            const response = await api.put(`${API_BASE_URL}/images/${imageId}`, { order });
-            return response.data.data;
-        } catch (error) {
-            throw handleAxiosError(error, 'Falha ao atualizar ordem da imagem', 'Imagem não encontrada');
-        }
-    }
-
-    static async deleteImage(imageId: string): Promise<ProductImage> {
+    static async deleteImage(imageId: ProductImage['id']): Promise<ProductImage> {
         try {
             const response = await api.delete(`${API_BASE_URL}/images/${imageId}`);
             return response.data.deleted;

@@ -37,22 +37,20 @@
 </template>
 
 <script lang="ts" setup>
+import { emailRules, passwordRules } from '@/utils/formRules';
 import { reactive, ref, toRefs, watchEffect } from 'vue'
+import type { LoginForm } from '@/types/auth/auth'
 
-interface LoginFormData {
-  email: string
-  password: string
-  remember: boolean
-}
+
 
 const props = defineProps<{
-  modelValue: LoginFormData
+  modelValue: LoginForm
   isSubmitting: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: LoginFormData): void
-  (e: 'submit', value: LoginFormData): void
+  (e: 'update:modelValue', value: LoginForm): void
+  (e: 'submit', value: LoginForm): void
 }>()
 
 const localForm = reactive(toRefs(props.modelValue))
