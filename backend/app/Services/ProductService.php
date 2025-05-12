@@ -18,8 +18,17 @@ class ProductService
             ->orderByDesc('created_at')
             ->paginate($perPage);
     }
+
+    public function findWithImages(int $id): ?Product
+    {
+        return Product::with(['images' => function ($query) {
+            $query->where('deleted', false)
+                  ->orderBy('order')
+                  ->select(['id', 'product_id', 'path', 'order', 'deleted']);
+        }])->find($id);
+    }
     
-    public function createProduct($data)
+    public function createProduct($data): Product
     {
         return Product::create($data);
     }

@@ -40,13 +40,19 @@ class ProductController extends Controller
     }
 
 
-    public function show(Product $product)
+    public function show($id)
     {
-        return $product->load(['images' => function ($query) {
-            $query->where('deleted', false)
-                ->orderBy('order')
-                ->select(['id','product_id', 'path', 'order', 'deleted']);
-        }]);
+        $product = $this->productService->findWithImages($id);
+
+        if (!$product) {
+            return response()->json([
+                'message' => 'Produto não encontrado.',
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $product
+        ]);
     }
 
 
